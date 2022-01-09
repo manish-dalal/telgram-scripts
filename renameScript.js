@@ -5,18 +5,17 @@
 const axios = require('axios');
 
 const CHANNEL = '@premium_stocks';
-// const DOODSTREAMAPI = '72288nzohhhv0hp933n07';
+const DOODSTREAMAPI = '72288nzohhhv0hp933n07';
 // other
-const DOODSTREAMAPI = '81085or5p8wkfj6dty6r8';
+// const DOODSTREAMAPI = '81085or5p8wkfj6dty6r8';
 const RECORD_PER_PAGE = 200; // max 200
-const LIST_MAX_PAGES = 2;
+const LIST_MAX_PAGES = 5;
 
 const operations = async (array1) => {
   let x = 0;
   for (const element of array1) {
-    console.log('Index', x);
     if (element.title.includes(CHANNEL)) {
-      console.log('Already renamed');
+      console.log('Index', x, 'Already renamed');
     } else if (element.title.includes('@')) {
       let params = {
         key: DOODSTREAMAPI,
@@ -26,9 +25,9 @@ const operations = async (array1) => {
       const url = new URL(`https://doodapi.com/api/file/rename`);
       url.search = new URLSearchParams(params);
       const res = await axios.get(url.href);
-      console.log('res', JSON.stringify(res?.data));
+      console.log('Index', x, 'res', JSON.stringify(res?.data));
     } else {
-      console.log('No @ found ');
+      console.log('Index', x, 'No @ found ');
     }
     x++;
   }
@@ -55,12 +54,12 @@ const getData = async () => {
       element === LIST_MAX_PAGES
     ) {
       console.log('data length', data.length, 'element===', element);
-      console.log(
-        JSON.stringify(
-          data.map((e) => ({ download_url: e.download_url, length: e.length }))
-        )
-      );
-      // operations(data);
+      // console.log(
+      //   JSON.stringify(
+      //     data.map((e) => ({ download_url: e.download_url, length: e.length }))
+      //   )
+      // );
+      operations(data);
       break;
     }
   }

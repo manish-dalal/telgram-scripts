@@ -14,6 +14,7 @@ API_ID = environ.get('API_ID')
 API_HASH = environ.get('API_HASH')
 BOT_TOKEN = environ.get('BOT_TOKEN')
 MDISK_TOKEN = environ.get('MDISK_TOKEN')
+DOODSTREAM_API_KEY = environ.get('DOODSTREAM_API_KEY')
 BITLY_KEY = environ.get('BITLY_KEY')
 THUMB_URL = environ.get('THUMB_URL', 'https://telegra.ph/file/1181d9119a13988dfe29c.jpg')
 CHANNEL = environ.get('CHANNEL')
@@ -29,7 +30,7 @@ bot = Client('Doodstream bot',
 async def start(bot, message):
     await message.reply(
         f"**𝗛𝗘𝗟𝗟𝗢🎈{message.chat.first_name}!**\n\n"
-        "𝐈'𝐦 𝐚 Mdisk 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐫 𝐛𝐨𝐭. 𝐉𝐮𝐬𝐭 𝐬𝐞𝐧𝐝 𝐦𝐞 𝐥𝐢𝐧𝐤 𝐨𝐫 𝐅𝐮𝐥𝐥 𝐩𝐨𝐬𝐭... \n 𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @"+ CHANNEL +"💖")
+        "𝐈'𝐦 𝐚 Doodstream/mdisk 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐫 𝐛𝐨𝐭. 𝐉𝐮𝐬𝐭 𝐬𝐞𝐧𝐝 𝐦𝐞 𝐥𝐢𝐧𝐤 𝐨𝐫 𝐅𝐮𝐥𝐥 𝐩𝐨𝐬𝐭... \n 𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 𝐦𝐚𝐝𝐞 𝐛𝐲 @"+ CHANNEL +"💖")
 
 
 @bot.on_message(filters.text & filters.private)
@@ -88,24 +89,40 @@ async def pdisk_up(alink):
     # title_ddisk = await get_dtitle(link)
     channel_name = "@" + CHANNEL
     title_Doodstream = re.sub('/@.[a-zA-Z0-9_]*/g', channel_name, title_new)
-
-    url = 'https://diskuploader.mypowerdisk.com/v1/tp/cp'
-    param = {'token': MDISK_TOKEN,'link': link}
-    res = requests.post(url, json = param)
-      
-    data = res.json()
-    data = dict(data)
-    print("mdisk data", data)
-    v_url = ''
-    if 'sharelink' in data:
-      v_url = data['sharelink']
-      # s = Shortener(api_key=BITLY_KEY)
-      # v_url = s.bitly.short(v_url)
-    elif 'msg' in data:
-      v_url = " " + data['msg']
+    if ('mdisk' in link):     
+        url = 'https://diskuploader.mypowerdisk.com/v1/tp/cp'
+        param = {'token': MDISK_TOKEN,'link': link}
+        res = requests.post(url, json = param)
+        data = res.json()
+        data = dict(data)
+        print("mdisk data", data)
+        v_url = ''
+        if 'sharelink' in data:
+            v_url = data['sharelink']
+            # s = Shortener(api_key=BITLY_KEY)
+            # v_url = s.bitly.short(v_url)
+        elif 'msg' in data:
+            v_url = " " + data['msg']
+        else:
+            v_url = ' Error'
+        return (v_url)
     else:
-      v_url = ' Error'
-    return (v_url)
+        res = requests.get(
+         f'https://doodapi.com/api/upload/url?key={DOODSTREAM_API_KEY}&url={link}&new_title={title_Doodstream}')
+        data = res.json()
+        data = dict(data)
+        print("Doodstream data", data)
+        v_url = ''
+        if 'result' in data:
+            v_id = data['result']['filecode']
+            v_url = 'https://dood.ws/d/' + v_id
+            # s = Shortener(api_key=BITLY_KEY)
+            # v_url = s.bitly.short(v_url)
+        elif 'msg' in data:
+            v_url = " " + data['msg']
+        else:
+            v_url = ' Error'
+        return (v_url)
 
 
 # async def multi_pdisk_up(ml_string):
