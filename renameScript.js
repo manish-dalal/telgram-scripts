@@ -35,8 +35,10 @@ const operations = async (array1) => {
 
 const getData = async () => {
   let data = [];
-  let loopArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  for (const element of loopArr) {
+  let loopArr = Array(10);
+  let element = 0;
+  for (const el of loopArr) {
+    element = element + 1;
     let params = {
       key: DOODSTREAMAPI,
       page: element,

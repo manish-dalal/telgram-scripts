@@ -1,31 +1,65 @@
-const dataStr = require('./NewData/english');
+const axios = require('axios');
 
-const data2Str = require('./NewData/english1');
+const dataStr = require('./NewData/data');
 
-const getLinkObj = () => {
+// const data2Str = require('./NewData/english1');
+
+const CHANNEL = '@premium_stocks';
+const MDISKTOKEN = 'yjl3syUTD46UZ3D4bhwa';
+
+// get
+const infoUrl = 'https://diskuploader.mypowerdisk.com/v1/tp/filename';
+// params = { token: 'l3ae9WQ7ru5ys5Dxxc3O', rid: 'MZdAES ' };
+
+// post
+const renameUrl = 'https://diskuploader.mypowerdisk.com/v1/tp/info';
+// param = {'token': 'l3ae9WQ7ru5ys5Dxxc3O','rid':'MZdAES','filename':'name_1'}
+
+const getLinkObj = async () => {
+  const dataWithName = [];
+  const errorUrls = [];
+
   var urlRegex = /(https?:\/\/[^ ]*)/g;
-  var urls = dataStr.match(urlRegex);
+  var urls = dataStr.replace(/\r?\n|\r/g, ' ').match(urlRegex);
   console.log('urls', urls.length);
-  const obj = urls.reduce(
-    (ac, cu) => ({
-      ...ac,
-      [cu]: (ac[cu] || 0) + (cu === ac.last ? 0 : 1),
-      last: cu,
-    }),
-    {}
-  );
-  Object.keys(obj).forEach((e) => {
-    if (obj[e] < 2) delete obj[e];
-  });
-  console.log('obj', obj);
-  // let conut = 0;
-  // urls.forEach((e) => {
-  //   if (dataStr.includes(e)) {
-  //     console.log(e);
-  //     conut++;
-  //     console.log('\n');
-  //   }
-  //   if (e === urls[urls.length - 1]) console.log('count', conut);
-  // });
+  for (const el of urls) {
+    const elArr = el.split('/');
+    let params = {
+      token: MDISKTOKEN,
+      rid: elArr[elArr.length - 1],
+    };
+    try {
+      const url = new URL(infoUrl);
+      url.search = new URLSearchParams(params);
+      const res = await axios.get(url.href);
+      const { data = {} } = res;
+      // console.log('datat@@@', data);
+      if (
+        data.status === 'ok' &&
+        data.filename !== data.filename.replace(/@.[a-zA-Z0-9_]*/g, CHANNEL)
+      ) {
+        dataWithName.push({
+          rid: elArr[elArr.length - 1],
+          filename: data.filename.replace(/@.[a-zA-Z0-9_]*/g, CHANNEL),
+        });
+      }
+    } catch (error) {
+      errorUrls.push(el);
+    }
+    if (el === urls[urls.length - 1]) {
+      // console.log('Final data', JSON.stringify(dataWithName));
+      console.log('errorUrls', JSON.stringify(errorUrls));
+      for (const elFinal of dataWithName) {
+        let params1 = {
+          token: MDISKTOKEN,
+          ...elFinal,
+        };
+        const url1 = new URL(renameUrl);
+        const res1 = await axios.post(url1.href, params1);
+        const { data: data1 } = res1;
+        console.log('dataaa', JSON.stringify(data1));
+      }
+    }
+  }
 };
 getLinkObj();
