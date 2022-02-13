@@ -4,6 +4,7 @@
   "description": "",
   "main": "doodstreamScript.js",
   "scripts": {
+    "start": "node renameMdisk.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
