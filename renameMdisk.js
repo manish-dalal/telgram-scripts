@@ -1,5 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
+var emojiStrip = require('emoji-strip');
 
 const storeData = (path, data) => {
   try {
@@ -34,36 +35,48 @@ const getLinkObj = async () => {
   console.log('urls', urls.length);
   for (const el of urls) {
     const elArr = el.split('/');
+    const videoRid = elArr[elArr.length - 1];
     let params = {
       token: MDISKTOKEN,
-      rid: elArr[elArr.length - 1],
+      rid: videoRid,
     };
     try {
       const url = new URL(infoUrl);
       url.search = new URLSearchParams(params);
       const res = await axios.get(url.href);
       const { data = {} } = res;
-      console.log('@@@', urls.indexOf(el), data);
-      const newFilename = data.filename.replace(/@.[a-zA-Z0-9_]*/g, CHANNEL);
-      if (data.status === 'ok' && data.filename !== newFilename) {
+      console.log('@@@', urls.indexOf(el), JSON.stringify(data));
+      const newFilename = emojiStrip(data.filename)
+        .replace(/@.[a-zA-Z0-9_]*/g, CHANNEL)
+        .replace(/[`~!#$%^&*()|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, ' ');
+      if (data.filename !== newFilename) {
         dataWithName.push({
-          rid: elArr[elArr.length - 1],
+          rid: videoRid,
           filename: newFilename,
         });
       }
       allData.push({
-        rid: elArr[elArr.length - 1],
+        rid: videoRid,
         filename: newFilename,
       });
-      if (el === urls[urls.length - 1]) {
-        // console.log('Final data', JSON.stringify(dataWithName));
-        // console.log('errorUrls', JSON.stringify(errorUrls));
-        for (const elFinal of dataWithName) {
-          let params1 = {
-            token: MDISKTOKEN,
-            ...elFinal,
-          };
-          const url1 = new URL(renameUrl);
+    } catch (error) {
+      errorUrls.push({
+        action: 'fetch info',
+        ...el,
+      });
+    }
+    if (el === urls[urls.length - 1]) {
+      // console.log('Final data', JSON.stringify(dataWithName));
+      // console.log('errorUrls', JSON.stringify(errorUrls));
+      storeData('./save/allData.json', allData);
+      storeData('./save/errorUrls.json', errorUrls);
+      for (const elFinal of dataWithName) {
+        let params1 = {
+          token: MDISKTOKEN,
+          ...elFinal,
+        };
+        const url1 = new URL(renameUrl);
+        try {
           const res1 = await axios.post(url1.href, params1);
           const { data: data1 } = res1;
           console.log(
@@ -78,12 +91,13 @@ const getLinkObj = async () => {
             storeData('./save/allData.json', allData);
             storeData('./save/errorUrls.json', errorUrls);
           }
+        } catch (error1) {
+          errorUrls.push({
+            action: 'rename',
+            ...elFinal,
+          });
         }
-        storeData('./save/allData.json', allData);
-        storeData('./save/errorUrls.json', errorUrls);
       }
-    } catch (error) {
-      errorUrls.push(el);
     }
   }
 };
