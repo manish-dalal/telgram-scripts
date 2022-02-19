@@ -46,13 +46,17 @@ const getLinkObj = async () => {
       const res = await axios.get(url.href);
       const { data = {} } = res;
       console.log('@@@', urls.indexOf(el), JSON.stringify(data));
-      const newFilename = emojiStrip(data.filename)
-        .replace(/@.[a-zA-Z0-9_]*/g, CHANNEL)
-        .replace(/[`~!#$%^&*()|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, ' ');
+      const newFilename = emojiStrip(data.filename).replace(
+        /@.[a-zA-Z0-9_]*/g,
+        CHANNEL
+      );
       if (data.filename !== newFilename) {
         dataWithName.push({
           rid: videoRid,
-          filename: newFilename,
+          filename: newFilename.replace(
+            /[`~!#$%^&*()|+\-=?;:'",.<>\{\}\[\]\\\/]/gi,
+            ' '
+          ),
         });
       }
       allData.push({
@@ -68,8 +72,11 @@ const getLinkObj = async () => {
     if (el === urls[urls.length - 1]) {
       // console.log('Final data', JSON.stringify(dataWithName));
       // console.log('errorUrls', JSON.stringify(errorUrls));
-      storeData('./save/allData.json', allData);
-      storeData('./save/errorUrls.json', errorUrls);
+      const date = new Date();
+      const dateStr =
+        date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear();
+      storeData(`./save/allData-${dateStr}.json`, allData);
+      storeData(`./save/errorUrls-${dateStr}.json`, errorUrls);
       for (const elFinal of dataWithName) {
         let params1 = {
           token: MDISKTOKEN,
@@ -88,8 +95,15 @@ const getLinkObj = async () => {
             console.log('allData', allData.length);
             console.log('dataWithName', dataWithName.length);
             console.log('errorUrls', JSON.stringify(errorUrls));
-            storeData('./save/allData.json', allData);
-            storeData('./save/errorUrls.json', errorUrls);
+            const date = new Date();
+            const dateStr =
+              date.getDate() +
+              '-' +
+              (date.getMonth() + 1) +
+              '-' +
+              date.getFullYear();
+            storeData(`./save/allData-${dateStr}.json`, allData);
+            storeData(`./save/errorUrls-${dateStr}.json`, errorUrls);
           }
         } catch (error1) {
           errorUrls.push({
