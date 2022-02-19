@@ -66,7 +66,7 @@ const getLinkObj = async () => {
     } catch (error) {
       errorUrls.push({
         action: 'fetch info',
-        ...el,
+        data: el,
       });
     }
     if (el === urls[urls.length - 1]) {
@@ -108,7 +108,7 @@ const getLinkObj = async () => {
         } catch (error1) {
           errorUrls.push({
             action: 'rename',
-            ...elFinal,
+            data: elFinal,
           });
         }
       }
