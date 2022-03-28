@@ -14,7 +14,7 @@ const dataStr = require('./NewData/data');
 
 // const data2Str = require('./NewData/english1');
 
-const CHANNEL = '@premium_stocks';
+const CHANNEL = '@primexmov';
 const MDISKTOKEN = 'yjl3syUTD46UZ3D4bhwa';
 
 // get

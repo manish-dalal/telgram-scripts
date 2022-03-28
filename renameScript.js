@@ -4,12 +4,12 @@
 
 const axios = require('axios');
 
-const CHANNEL = '@premium_stocks';
-const DOODSTREAMAPI = '72288nzohhhv0hp933n07';
+const CHANNEL = '@primexmov';
+const DOODSTREAMAPI = '83465j7qggcbkgc0mx6xu';
 // other
 // const DOODSTREAMAPI = '81085or5p8wkfj6dty6r8';
 const RECORD_PER_PAGE = 200; // max 200
-const LIST_MAX_PAGES = 5;
+const LIST_MAX_PAGES = 40;
 
 const operations = async (array1) => {
   let x = 0;
@@ -35,7 +35,7 @@ const operations = async (array1) => {
 
 const getData = async () => {
   let data = [];
-  let loopArr = Array(10);
+  let loopArr = Array(LIST_MAX_PAGES);
   let element = 0;
   for (const el of loopArr) {
     element = element + 1;
