@@ -47,7 +47,7 @@ const getLinkObj = async () => {
       const { data = {} } = res;
       console.log('@@@', urls.indexOf(el), JSON.stringify(data));
       const newFilename = emojiStrip(data.filename).replace(
-        /@.[a-zA-Z0-9_]*/g,
+        /@.[a-zA-Z0-9_-]*/g,
         CHANNEL
       );
       if (data.filename !== newFilename) {
