@@ -12,8 +12,12 @@ var count = 1;
       const res = await axios.get(
         'https://diskuploader.glitch.me/api/message/update-cloudinary?cname=v1&linkType=mdisk&pageSize=10'
       );
-      console.log('Done index', count);
-      count++;
+      console.log('Done index', count, 'length', res.data.messages.length);
+      if (res?.data?.messages?.length) {
+        count++;
+      } else {
+        return false;
+      }
     } catch (error) {
       console.log('error', error.message);
     }
