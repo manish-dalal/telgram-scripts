@@ -6,6 +6,14 @@ const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
+const storeOverWriteData = (path, data) => {
+  try {
+    fs.writeFileSync(path, JSON.stringify(data));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 const storeData = (path, data) => {
   try {
     fs.appendFileSync(path, '\n' + JSON.stringify(data));
@@ -28,6 +36,7 @@ const getLinks = async () => {
       storeData(`./save/errorUrls.json`, videoId);
       console.log('error', error);
     }
+    storeOverWriteData(`./save/current.json`, urls.indexOf(el) + '=' + videoId);
     console.log('el', urls.indexOf(el), '@  ', videoId);
   }
 };
